@@ -25,13 +25,14 @@ To install the Retargeting Tracker module for Magento 2 follow the instructions 
 
 1. Backup your Magento code and database before removing the module.
 2. Open SSH console of your server navigate to your store root folder:
-   * cd path_to_the_store_root_folder
+    * cd path_to_the_store_root_folder
     * php bin/magento module:disable --clear-static-content Retargeting_Tracker
     * php bin/magento module:uninstall Retargeting_Tracker
-   * php bin/magento setup:upgrade
-   * php bin/magento cache:clean
-   * php bin/magento setup:di:compile
-3. Flush store cache. Log out from the backend and log in again.
+    * php bin/magento setup:upgrade
+    * php bin/magento cache:clean
+    * php bin/magento setup:di:compile
+3. Remove all Retargeting_Tracker module files and directories: `rm -rf app/code/Retargeting`
+4. Flush store cache. Log out from the backend and log in again.
 
 # This module was developed and tested on Magento:
 
