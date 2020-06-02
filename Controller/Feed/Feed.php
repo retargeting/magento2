@@ -29,9 +29,11 @@ use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Store\Model\StoreManager;
+use Magento\Store\Model\Website;
 use Magento\Tax\Api\TaxCalculationInterface;
 use Retargeting\Tracker\Helper\Data;
 use Retargeting\Tracker\Helper\PriceHelper;
@@ -155,6 +157,7 @@ class Feed extends Action
 
         $stream = $this->directory->openFile($filepath, 'w+');
         $stream->lock();
+
         $columns = [
             'product id',
             'product name',
@@ -164,7 +167,8 @@ class Feed extends Action
             'price',
             'sale price',
             'brand',
-            'category'
+            'category',
+            'extra data'
         ];
 
         $stream->writeCsv($columns);
@@ -183,7 +187,7 @@ class Feed extends Action
                 $productLoopExit = true;
             } else {
                 foreach ($products as $product) {
-                    /** @var $product Product */
+
                     /** @noinspection PhpParamsInspection */
                     $stream->writeCsv([
                         'product id' => $product->getId(),
@@ -194,7 +198,8 @@ class Feed extends Action
                         'price' => $this->priceHelper->getFullPrice($product),
                         'sale price' => $this->priceHelper->getProductPrice($product),
                         'brand' => '',
-                        'category' => $this->retargetingData->getProductCategory($product->getCategoryIds())
+                        'category' => $this->retargetingData->getProductCategory($product->getCategoryIds()),
+                        'extra data' => json_encode([])
                     ]);
                 }
 
@@ -245,4 +250,35 @@ class Feed extends Action
 
         return $this->productRepository->getList($searchCriteria)->getItems();
     }
+
+    protected function getExtraDataProduct(array $productIds, $store) {
+
+        try {
+            $website = $store->getWebsite();
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+        if ($website instanceof Website === false) {
+            return null;
+        }
+        $stockItems = $this->getStockStatuses($productIds, $website);
+
+        $extraData = [];
+        foreach ($stockItems as $productId => $product) {
+
+            $extraData[] = (object) [
+                'id' => $product->getId(),
+                'price',
+                'sale price',
+                'stock',
+                'margin',
+                'in_supplier_stock'
+            ];
+
+        }
+
+        return $extraData;
+
+    }
+
 }

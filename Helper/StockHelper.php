@@ -14,6 +14,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\Website;
+use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku;
 
 /**
  * Class StockHelper
@@ -28,14 +29,20 @@ class StockHelper extends AbstractHelper
      * StockHelper constructor.
      * @param Context $context
      * @param StockRegistry $stockProvider
+     * @param GetSourceItemsBySku $getSourceItemsBySku
      */
     public function __construct(
         Context $context,
-        StockRegistry $stockProvider
+        StockRegistry $stockProvider,
+        GetSourceItemsBySku $getSourceItemsBySku,
+        PriceHelper $_retargetingPriceHelper
     )
     {
         parent::__construct($context);
         $this->stockProvider = $stockProvider;
+        $this->getSourceItemsBySku = $getSourceItemsBySku;
+        $this->_retargetingPriceHelper = $_retargetingPriceHelper;
+
     }
 
     /**
@@ -45,6 +52,7 @@ class StockHelper extends AbstractHelper
      */
     public function getQuantity(Product $product, Store $store)
     {
+
         $qty = 0;
         try {
             $website = $store->getWebsite();
@@ -120,9 +128,15 @@ class StockHelper extends AbstractHelper
         $quantities = [];
         $stockItems = $this->getStockStatuses($productIds, $website);
         /* @var Product $product */
+
         foreach ($stockItems as $stockItem) {
-            $quantities[$stockItem->getProductId()] = $stockItem->getQty();
+
+            $sourceItems = $this->getSourceItemsBySku->execute($stockItem->getSku());
+            foreach ($sourceItems as $sourceItemId => $sourceItem) {
+                $quantities[$sourceItemId] = $sourceItem->getQuantity();
+            }
         }
+
         return $quantities;
     }
 
@@ -199,4 +213,5 @@ class StockHelper extends AbstractHelper
             return false;
         }
     }
+
 }

@@ -194,21 +194,12 @@ class Product extends View
         Store $store
     )
     {
-        $stock = [
-            'variations' => false,
-            'stock' => false
-        ];
-
         $qty = $this->_retargetingStockHelper->getQuantity($product, $store);
 
-        if ($qty > 0) {
-            $stock = [
-                'variations' => false,
-                'stock' => true
-            ];
-        }
-
-        return $stock;
+        return [
+            'variations' => false,
+                'stock' => $qty < 0 ? 0 : $qty
+        ];
     }
 
     /**
