@@ -106,6 +106,7 @@ class Product extends View
         $this->_retargetingData = $_retargetingData;
         $this->_retargetingPriceHelper = $_retargetingPriceHelper;
         $this->_retargetingStockHelper = $_retargetingStockHelper;
+        $this->_productRepository = $productRepository;
     }
 
     /**
@@ -194,21 +195,12 @@ class Product extends View
         Store $store
     )
     {
-        $stock = [
-            'variations' => false,
-            'stock' => false
-        ];
-
         $qty = $this->_retargetingStockHelper->getQuantity($product, $store);
 
-        if ($qty > 0) {
-            $stock = [
-                'variations' => false,
-                'stock' => true
-            ];
-        }
-
-        return $stock;
+        return [
+            'variations' => false,
+                'stock' => $qty < 0 ? 0 : $qty
+        ];
     }
 
     /**
@@ -220,7 +212,12 @@ class Product extends View
     {
         $categories = [];
         foreach ($product->getCategoryCollection() as $category) {
-            $categories[] = $this->_retargetingData->buildCategory($category);
+
+            $buildCategory = $this->_retargetingData->buildCategory($category);
+
+            if (!empty($buildCategory)) {
+                $categories[] = $buildCategory;
+            }
         }
 
         return $categories;

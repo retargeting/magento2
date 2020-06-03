@@ -309,4 +309,74 @@ class Data extends AbstractHelper
 //        }
 //        return $qty;
     }
+
+    /**
+     * @param array $categories
+     * @return string|array
+     */
+    public function getProductCategoryNamesById(array $categories = [])
+    {
+        if (!count($categories)) {
+            return '';
+        }
+        foreach ($categories as $categoryId) {
+
+            if ($categoryId == 2) { // skip default category
+                continue;
+            }
+
+            try {
+                $category = $this->_categoryRepository->get($categoryId);
+                $categoryNames[] = $category->getName();
+            } catch (NoSuchEntityException $e) {
+
+            }
+        }
+
+        return implode(' | ', $categoryNames);
+    }
+
+    /**
+     * @param Product $product
+     * @return array
+     */
+    public function getMediaGallery(Product $product) {
+
+        $productGallery = $product->getMediaGalleryImages();
+
+        foreach ($productGallery as $key => $image) {
+
+            if ($image->getDisabled() === 1) { // skip hidden image
+                continue;
+            }
+            $gallery[] = $product->getMediaConfig()->getMediaUrl($image->getFile());
+        }
+
+       return $gallery;
+
+    }
+
+    /**
+     * @param array $mediaGallery
+     * @return array
+     */
+    public function mediaGalleryTransform(array $mediaGallery) {
+
+        $formattedGallery = null;
+        foreach ($mediaGallery as $key => $gallery) {
+
+            if (is_array($gallery)) {
+                foreach ($gallery as $image) {
+                    $formattedGallery[] = $image;
+                }
+            } else {
+                $formattedGallery[] = $gallery;
+            }
+
+        }
+
+        return array_unique($formattedGallery);
+    }
+
+
 }

@@ -14,6 +14,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\Website;
+use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku;
 
 /**
  * Class StockHelper
@@ -28,14 +29,20 @@ class StockHelper extends AbstractHelper
      * StockHelper constructor.
      * @param Context $context
      * @param StockRegistry $stockProvider
+     * @param GetSourceItemsBySku $getSourceItemsBySku
      */
     public function __construct(
         Context $context,
-        StockRegistry $stockProvider
+        StockRegistry $stockProvider,
+        GetSourceItemsBySku $getSourceItemsBySku,
+        PriceHelper $_retargetingPriceHelper
     )
     {
         parent::__construct($context);
         $this->stockProvider = $stockProvider;
+        $this->getSourceItemsBySku = $getSourceItemsBySku;
+        $this->_retargetingPriceHelper = $_retargetingPriceHelper;
+
     }
 
     /**
@@ -45,6 +52,7 @@ class StockHelper extends AbstractHelper
      */
     public function getQuantity(Product $product, Store $store)
     {
+
         $qty = 0;
         try {
             $website = $store->getWebsite();
@@ -120,9 +128,16 @@ class StockHelper extends AbstractHelper
         $quantities = [];
         $stockItems = $this->getStockStatuses($productIds, $website);
         /* @var Product $product */
+
         foreach ($stockItems as $stockItem) {
-            $quantities[$stockItem->getProductId()] = $stockItem->getQty();
+
+            $sourceItems = $this->getSourceItemsBySku->execute($stockItem->getSku());
+            foreach ($sourceItems as $sourceItemId => $sourceItem) {
+                $quantities[$sourceItemId] = $sourceItem->getQuantity();
+            }
+
         }
+
         return $quantities;
     }
 
@@ -131,7 +146,7 @@ class StockHelper extends AbstractHelper
      * @param Website $website
      * @return array
      */
-    private function getStockStatuses(
+    public function getStockStatuses(
         array $ids,
         /** @noinspection PhpUnusedParameterInspection */
         Website $website
@@ -168,19 +183,23 @@ class StockHelper extends AbstractHelper
         Website $website
     )
     {
-        return (int)$this->getStockItem($product)->getQty();
+        return (int)$this->getStockItem($product);
     }
 
     /**
      * @param Product $product
-     * @return StockItemInterface
+     * @return float|int
      */
     private function getStockItem(Product $product)
     {
-        return $this->stockProvider->getStockItem(
-            $product->getId(),
-            StockRegistry::DEFAULT_STOCK_SCOPE
-        );
+
+        $sourceItems = $this->getSourceItemsBySku->execute($product->getSku());
+        $quantities = 0;
+        foreach ($sourceItems as $sourceItemId => $sourceItem) {
+            $quantities += $sourceItem->getQuantity();
+        }
+
+        return $quantities;
     }
 
     /**
@@ -199,4 +218,6 @@ class StockHelper extends AbstractHelper
             return false;
         }
     }
+
+
 }
