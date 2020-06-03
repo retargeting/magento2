@@ -13,11 +13,13 @@
 namespace Retargeting\Tracker\Controller\Feed;
 
 use Exception;
+use Laminas\Db\Sql\Ddl\Column\Integer;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Ui\DataProvider\Product\ProductCollectionFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -35,9 +37,11 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Store\Model\StoreManager;
 use Magento\Store\Model\Website;
 use Magento\Tax\Api\TaxCalculationInterface;
+use phpseclib\Math\BigInteger;
 use Retargeting\Tracker\Helper\Data;
 use Retargeting\Tracker\Helper\PriceHelper;
 use Retargeting\Tracker\Helper\StockHelper;
+use Magento\Store\Model\Store;
 
 /**
  * Class Feed
@@ -125,7 +129,8 @@ class Feed extends Action
         Data $retargetingData,
         FileFactory $fileFactory,
         Filesystem $filesystem,
-        StockHelper $retargetingStockHelper
+        StockHelper $retargetingStockHelper,
+        \Magento\Catalog\Model\ProductFactory $productFactory
     )
     {
         parent::__construct($context);
@@ -141,6 +146,8 @@ class Feed extends Action
         $this->fileFactory = $fileFactory;
         $this->directory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
         $this->stockHelper = $retargetingStockHelper;
+        $this->productFactory = $productFactory;
+
     }
 
     /**
@@ -178,6 +185,7 @@ class Feed extends Action
         $lastProductId = 0;
         $storeId = $this->storeManager->getStore()->getId();
         $store = $this->storeManager->getStore($storeId);
+
         while (!$productLoopExit) {
             $products = $this->getProducts($productPage);
             $productPage++;
@@ -187,6 +195,9 @@ class Feed extends Action
                 $productLoopExit = true;
             } else {
                 foreach ($products as $product) {
+
+                    $productType = $product->getTypeInstance();
+                    $bundledItemIds = $productType->getChildrenIds($product->getId(), $required = true);
 
                     /** @noinspection PhpParamsInspection */
                     $stream->writeCsv([
@@ -199,7 +210,7 @@ class Feed extends Action
                         'sale price' => $this->priceHelper->getProductPrice($product),
                         'brand' => '',
                         'category' => $this->retargetingData->getProductCategory($product->getCategoryIds()),
-                        'extra data' => json_encode([])
+                        'extra data' => json_encode($this->getExtraDataProduct($bundledItemIds, $store, $product->getId()))
                     ]);
                 }
 
@@ -251,7 +262,14 @@ class Feed extends Action
         return $this->productRepository->getList($searchCriteria)->getItems();
     }
 
-    protected function getExtraDataProduct(array $productIds, $store) {
+    /**
+     * @param array $productIds
+     * @param Store $store
+     * @param Integer $productId
+     * @return array|null
+     * @throws NoSuchEntityException
+     */
+    protected function getExtraDataProduct(array $productIds, Store $store, $productId) {
 
         try {
             $website = $store->getWebsite();
@@ -261,20 +279,38 @@ class Feed extends Action
         if ($website instanceof Website === false) {
             return null;
         }
-        $stockItems = $this->getStockStatuses($productIds, $website);
+
+        $stockItems = $this->stockHelper->getStockStatuses($productIds, $website);
+        $parentProd = $this->productRepository->getById($productId);
 
         $extraData = [];
+        $extraData['margin'] = null;
+        $extraData['categories'] = $this->retargetingData->getProductCategoryNamesById($parentProd->getCategoryIds());
+        $extraData['media_gallery'][] = $parentProd->getMediaConfig()->getMediaUrl($parentProd->getImage());
+        $extraData['in_supplier_stock'] = null;
+
         foreach ($stockItems as $productId => $product) {
 
-            $extraData[] = (object) [
-                'id' => $product->getId(),
-                'price',
-                'sale price',
-                'stock',
-                'margin',
-                'in_supplier_stock'
+
+            $productCollection = $this->productRepository->getById($product->getId());
+
+            $extraData['media_gallery'][] = $this->retargetingData->getMediaGallery($productCollection);
+            $extraData['variations'][] = [
+                'id' => $productCollection->getId(),
+                'price' => $this->priceHelper->getFullPrice($productCollection),
+                'sale price' => $this->priceHelper->getProductPrice($productCollection),
+                'stock' => $this->stockHelper->getQuantity($productCollection, $store),
+                'margin' => null,
+                'in_supplier_stock' => null
             ];
 
+
+        }
+
+        $extraData['media_gallery'] = $this->retargetingData->mediaGalleryTransform($extraData['media_gallery']);
+
+        if (!isset($extraData['variations'])) {
+            $extraData['variations'] = null;
         }
 
         return $extraData;

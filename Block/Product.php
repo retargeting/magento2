@@ -106,6 +106,7 @@ class Product extends View
         $this->_retargetingData = $_retargetingData;
         $this->_retargetingPriceHelper = $_retargetingPriceHelper;
         $this->_retargetingStockHelper = $_retargetingStockHelper;
+        $this->_productRepository = $productRepository;
     }
 
     /**
@@ -211,7 +212,12 @@ class Product extends View
     {
         $categories = [];
         foreach ($product->getCategoryCollection() as $category) {
-            $categories[] = $this->_retargetingData->buildCategory($category);
+
+            $buildCategory = $this->_retargetingData->buildCategory($category);
+
+            if (!empty($buildCategory)) {
+                $categories[] = $buildCategory;
+            }
         }
 
         return $categories;

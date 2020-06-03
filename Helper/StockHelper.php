@@ -135,6 +135,7 @@ class StockHelper extends AbstractHelper
             foreach ($sourceItems as $sourceItemId => $sourceItem) {
                 $quantities[$sourceItemId] = $sourceItem->getQuantity();
             }
+
         }
 
         return $quantities;
@@ -145,7 +146,7 @@ class StockHelper extends AbstractHelper
      * @param Website $website
      * @return array
      */
-    private function getStockStatuses(
+    public function getStockStatuses(
         array $ids,
         /** @noinspection PhpUnusedParameterInspection */
         Website $website
@@ -182,19 +183,23 @@ class StockHelper extends AbstractHelper
         Website $website
     )
     {
-        return (int)$this->getStockItem($product)->getQty();
+        return (int)$this->getStockItem($product);
     }
 
     /**
      * @param Product $product
-     * @return StockItemInterface
+     * @return float|int
      */
     private function getStockItem(Product $product)
     {
-        return $this->stockProvider->getStockItem(
-            $product->getId(),
-            StockRegistry::DEFAULT_STOCK_SCOPE
-        );
+
+        $sourceItems = $this->getSourceItemsBySku->execute($product->getSku());
+        $quantities = 0;
+        foreach ($sourceItems as $sourceItemId => $sourceItem) {
+            $quantities += $sourceItem->getQuantity();
+        }
+
+        return $quantities;
     }
 
     /**
@@ -213,5 +218,6 @@ class StockHelper extends AbstractHelper
             return false;
         }
     }
+
 
 }
