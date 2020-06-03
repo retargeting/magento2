@@ -233,7 +233,7 @@ class Feed extends Action
      * @param int $pageSize
      * @return ProductInterface[]
      */
-    public function getProducts($page = 1, $pageSize = 5)
+    public function getProducts($page = 1, $pageSize = 250)
     {
         $this->searchCriteriaBuilder->addFilter(
             'type_id',
