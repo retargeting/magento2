@@ -344,6 +344,7 @@ class Data extends AbstractHelper
 
         $productGallery = $product->getMediaGalleryImages();
 
+        $gallery = [];
         foreach ($productGallery as $key => $image) {
 
             if ($image->getDisabled() === 1) { // skip hidden image
