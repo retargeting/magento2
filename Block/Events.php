@@ -92,7 +92,7 @@ class Events extends Template
                 $saveOrderProducts[] = [
                     'id' => $item->getId(),
                     'quantity' => $item->getQtyOrdered(),
-                    'price' => $item->getBasePrice(),
+                    'price' => $item->getFullPrice(),
                     'variation_code' => false
                 ];
             }
