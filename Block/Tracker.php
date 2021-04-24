@@ -110,7 +110,7 @@ class Tracker extends Template
                 $saveOrderProducts[] = [
                     'id' => $item->getProductId(),
                     'quantity' => $item->getQtyOrdered(),
-                    'price' => number_format($item->getBasePrice(), 2, '.', ''),
+                    'price' => number_format($item->getPriceInclTax(), 2, '.', ''),
                     'variation_code' => false
                 ];
             }
