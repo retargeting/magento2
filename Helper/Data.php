@@ -333,7 +333,11 @@ class Data extends AbstractHelper
             }
         }
 
-        return implode(' | ', $categoryNames);
+        if (isset($categoryNames)) {
+            return implode(' | ', is_array($categoryNames) ? $categoryNames : [ $categoryNames ] );
+        }
+        
+        return 'Default';
     }
 
     /**
