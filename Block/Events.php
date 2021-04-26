@@ -92,7 +92,8 @@ class Events extends Template
                 $saveOrderProducts[] = [
                     'id' => $item->getId(),
                     'quantity' => $item->getQtyOrdered(),
-                    'price' => $item->getBasePrice(),
+                    'price' => (int)$order->getBaseTaxAmount() > 0 ?
+                        $item->getPriceInclTax() : $item->getBasePrice(),
                     'variation_code' => false
                 ];
             }
