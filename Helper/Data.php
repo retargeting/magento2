@@ -337,7 +337,7 @@ class Data extends AbstractHelper
             return implode(' | ', is_array($categoryNames) ? $categoryNames : [ $categoryNames ] );
         }
         
-        return 'Default';
+        return '';
     }
 
     /**
