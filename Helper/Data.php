@@ -332,7 +332,7 @@ class Data extends AbstractHelper
 
             }
         }
-
+        
         return $categoryNames;
     }
 
