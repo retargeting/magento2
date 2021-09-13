@@ -107,12 +107,13 @@ class Tracker extends Template
             }
 
             foreach ($order->getAllVisibleItems() as $item) {
+                $orderPrice = (int) $order->getBaseTaxAmount() > 0 ?
+                $item->getPriceInclTax() : $item->getBasePrice();
+
                 $saveOrderProducts[] = [
                     'id' => $item->getProductId(),
                     'quantity' => $item->getQtyOrdered(),
-                    'price' => number_format((int)$order->getBaseTaxAmount() > 0 ?
-                        $item->getPriceInclTax() : $item->getBasePrice(),
-                        2, '.', ''),
+                    'price' => number_format($orderPrice, 2, '.', ''),
                     'variation_code' => false
                 ];
             }
