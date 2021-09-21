@@ -327,13 +327,13 @@ class Data extends AbstractHelper
 
             try {
                 $category = $this->_categoryRepository->get($categoryId);
-                $categoryNames[] = $category->getName();
+                $categoryNames[$categoryId] = $category->getName();
             } catch (NoSuchEntityException $e) {
 
             }
         }
-
-        return implode(' | ', $categoryNames);
+        
+        return $categoryNames;
     }
 
     /**

@@ -89,10 +89,13 @@ class Events extends Template
             }
 
             foreach ($order->getAllVisibleItems() as $item) {
+                $orderPrice = (int) $order->getBaseTaxAmount() > 0 ?
+                $item->getPriceInclTax() : $item->getBasePrice();
+
                 $saveOrderProducts[] = [
                     'id' => $item->getId(),
                     'quantity' => $item->getQtyOrdered(),
-                    'price' => $item->getBasePrice(),
+                    'price' => $orderPrice,
                     'variation_code' => false
                 ];
             }
