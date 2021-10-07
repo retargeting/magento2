@@ -319,6 +319,7 @@ class Data extends AbstractHelper
         if (!count($categories)) {
             return [];
         }
+        $categoryNames = [];
         foreach ($categories as $categoryId) {
 
             if ($categoryId == 2) { // skip default category
