@@ -317,8 +317,9 @@ class Data extends AbstractHelper
     public function getProductCategoryNamesById(array $categories = [])
     {
         if (!count($categories)) {
-            return '';
+            return [];
         }
+        $categoryNames = [];
         foreach ($categories as $categoryId) {
 
             if ($categoryId == 2) { // skip default category
