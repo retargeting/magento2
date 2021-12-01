@@ -120,97 +120,14 @@ class GenerateFeed {
         $this->logger = $logger;
 
     }
-/*
-    public function execute()
-    {
-        $name = date('m_d_Y_H_i_s');
-        $filepath = 'retargeting.csv.tmp';
-        $this->directory->create('export');
 
-        $stream = $this->directory->openFile($filepath, 'w+');
-        $stream->lock();
-
-        $columns = [
-            'product id',
-            'product name',
-            'product url',
-            'image url',
-            'stock',
-            'price',
-            'sale price',
-            'brand',
-            'category',
-            'extra data'
-        ];
-
-        $stream->writeCsv($columns);
-
-        $productPage = 1;
-        $productLoopExit = false;
-        $lastProductId = 0;
-        $storeId = $this->storeManager->getStore()->getId();
-        $store = $this->storeManager->getStore($storeId);
-
-        while (!$productLoopExit) {
-            $products = $this->getProducts($productPage);
-            $productPage++;
-            if (!count($products) || (array_values(array_slice($products, -1))[0]->getId() == $lastProductId)
-            ) {
-                $productLoopExit = true;
-            } else {
-                foreach ($products as $product) {
-
-                    $productType = $product->getTypeInstance();
-                    $bundledItemIds = $productType->getChildrenIds($product->getId(), $required = true);
-
-                    $category = $this->retargetingData->getProductCategory($product->getCategoryIds());
-                    $stock = $this->stockHelper->getQuantity($product, $store);
-                    $price = $this->priceHelper->getFullPrice($product);
-                    $promo = $this->priceHelper->getProductPrice($product);
-                    $imgUrl = $product->getMediaConfig()->getMediaUrl($product->getImage());
-                    $url = $product->getProductUrl(false);
-
-                    if(
-                        $category == "" ||
-                        $price == 0 ||
-                        $promo == 0 ||
-                        $stock < 1 ||
-                        $imgUrl == "" ||
-                        $url == ""
-                    ) {
-                        continue;
-                    }
-
-                    /** @noinspection PhpParamsInspection * /
-                    $stream->writeCsv([
-                        'product id' => $product->getId(),
-                        'product name' => $product->getName(),
-                        'product url' => $url,
-                        'image url' => $imgUrl,
-                        'stock' => $stock,
-                        'price' => $price,
-                        'sale price' => $promo,
-                        'brand' => '',
-                        'category' => $category,
-                        'extra data' => json_encode($this->getExtraDataProduct($bundledItemIds, $store, $product->getId()))
-                    ]);
-                }
-
-                $lastProductId = array_values(array_slice($products, -1))[0]->getId();
-            }
-        }
-
-        rename('pub/'.$filepath, 'pub/retargeting.csv');
-        return true;
-
-    }
-    */
     private static $ids = [];
     private static $isExec = false;
+    private static $cronActive = false;
 
     public function execute()
     {
-        if (!self::$isExec) {
+        if (!self::$isExec && self::$cronActive) {
             $name = date('m_d_Y_H_i_s');
             $filepath = 'retargeting'.$name.'.csv';
             //$this->directory->create('export');
