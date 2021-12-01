@@ -203,11 +203,11 @@ class PriceHelper extends AbstractHelper
      */
     public function getFinalPrice(Product $product, $price = null)
     {
-        if ($price === null) {
+        if (empty($price)) {
             $price = $product->getFinalPrice();
         }
 
-        if ($price === null) {
+        if (empty($price)) {
             $price = $product->getData('special_price');
         }
 
@@ -263,15 +263,19 @@ class PriceHelper extends AbstractHelper
      */
     public function getFullPrice(Product $product, $price = null)
     {
-        if ($price === null) {
+        if (empty($price)) {
             $price = $product->getPrice();
         }
-
-        if ($price === null) {
+        
+        if (empty($price)) {
             $price = $product->getData('regular_price');
         }
 
-        if ($price == 0) {
+        if (empty($price)) {
+            $price = (string) $product->getPriceInfo()->getPrice('regular_price')->getValue();
+        }
+
+        if (empty($price)) {
             $price = $this->getFinalPrice($product);
         }
 

@@ -1,16 +1,9 @@
 <?php
-/**
- * The Retargeting Magento 2 extension implements the required tagging for Retargeting's
- * functions in Magento 2 based web-shops.
- *
- * @category    Retargeting
- * @package     Retargeting_Tracking
- * @author      Retargeting Team <info@retargeting.biz>
- * @copyright   Retargeting (https://retargeting.biz)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
 
-namespace Retargeting\Tracker\Controller\Feed;
+namespace Retargeting\Tracker\Cron;
+
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Retargeting\Tracker\Controller\Feed\Feed;
 
 use Exception;
 use Laminas\Db\Sql\Ddl\Column\Integer;
@@ -26,7 +19,6 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
@@ -43,12 +35,7 @@ use Retargeting\Tracker\Helper\PriceHelper;
 use Retargeting\Tracker\Helper\StockHelper;
 use Magento\Store\Model\Store;
 
-/**
- * Class Feed
- * @package Retargeting\Tracker\Controller\Feed
- */
-class Feed extends Action
-{
+class GenerateFeed {
 
     protected $stockState;
 
@@ -97,25 +84,8 @@ class Feed extends Action
     protected $fileFactory;
     protected $directory;
     protected $stockHelper;
+    protected $logger;
 
-
-    /**
-     * Feed constructor.
-     * @param Context $context
-     * @param ProductRepositoryInterface $productRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param FilterBuilder $filterBuilder
-     * @param PageFactory $resultPageFactory
-     * @param StoreManager $storeManager
-     * @param ScopeConfigInterface $scopeConfig
-     * @param TaxCalculationInterface $taxCalculation
-     * @param PriceHelper $priceHelper
-     * @param Data $retargetingData
-     * @param FileFactory $fileFactory
-     * @param Filesystem $filesystem
-     * @param StockHelper $retargetingStockHelper
-     * @throws FileSystemException
-     */
     public function __construct(
         Context $context,
         ProductRepositoryInterface $productRepository,
@@ -130,10 +100,10 @@ class Feed extends Action
         FileFactory $fileFactory,
         Filesystem $filesystem,
         StockHelper $retargetingStockHelper,
-        \Magento\Catalog\Model\ProductFactory $productFactory
-    )
-    {
-        parent::__construct($context);
+        \Magento\Catalog\Model\ProductFactory $productFactory,
+        \Psr\Log\LoggerInterface $logger
+    ) {
+
         $this->productRepository = $productRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->filterBuilder = $filterBuilder;
@@ -147,24 +117,20 @@ class Feed extends Action
         $this->directory = $filesystem->getDirectoryWrite(DirectoryList::PUB);
         $this->stockHelper = $retargetingStockHelper;
         $this->productFactory = $productFactory;
+        $this->logger = $logger;
 
     }
+
     private static $ids = [];
     private static $isExec = false;
-    /**
-     * Dispatch request
-     *
-     * @return ResultInterface|ResponseInterface
-     * @throws Exception
-     */
+    private static $cronActive = false;
+
     public function execute()
     {
-        if (!self::$isExec) {
-
+        if (!self::$isExec && self::$cronActive) {
             $name = date('m_d_Y_H_i_s');
             $filepath = 'retargeting'.$name.'.csv';
             //$this->directory->create('export');
-            self::$isExec = true;
 
             $stream = $this->directory->openFile($filepath, 'w+');
             $stream->lock();
@@ -228,17 +194,17 @@ class Feed extends Action
                 }
             }
 
-            $content = [];
-            $content['type'] = 'filename'; // must keep filename
-            $content['value'] = $filepath;
-            $content['rm'] = '1'; //remove csv from var folder
+            //$content = [];
+            //$content['type'] = 'filename'; // must keep filename
+            //$content['value'] = $filepath;
+            //$content['rm'] = '1'; //remove csv from var folder
 
             $csvFilename = 'retargeting.csv';
             
             //rename($csvFilename, $filepath);
             $this->directory->renameFile($filepath, $csvFilename);
-            
-            return $this->fileFactory->create($csvFilename, $content, DirectoryList::PUB);
+            //return $this->fileFactory->create($csvFilename, $content, DirectoryList::PUB);
+            return true;
         }
     }
 
@@ -247,7 +213,7 @@ class Feed extends Action
      * @param int $pageSize
      * @return ProductInterface[]
      */
-    public function getProducts($page = 1, $pageSize = 100)
+    public function getProducts($page = 1, $pageSize = 250)
     {
         $this->searchCriteriaBuilder->addFilter(
             'type_id',
@@ -310,9 +276,9 @@ class Feed extends Action
 
             $extraData['media_gallery'][] = $this->retargetingData->getMediaGallery($productCollection);
             $extraData['variations'][] = [
-                'code' => $productCollection->getId(),
+                'id' => $productCollection->getId(),
                 'price' => $this->priceHelper->getFullPrice($productCollection),
-                'sale_price' => $this->priceHelper->getProductPrice($productCollection),
+                'sale price' => $this->priceHelper->getProductPrice($productCollection),
                 'stock' => $this->stockHelper->getQuantity($productCollection, $store),
                 'margin' => null,
                 'in_supplier_stock' => null
