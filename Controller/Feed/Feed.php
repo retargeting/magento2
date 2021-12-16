@@ -234,7 +234,7 @@ class Feed extends Action
             $content = [];
             $content['type'] = 'filename'; // must keep filename
             $content['value'] = $csvFilename;
-            $content['rm'] = '1'; //remove csv from var folder
+            $content['rm'] = '0'; //remove csv from var folder
 
             $this->directory->renameFile($filepath, $csvFilename);
             
