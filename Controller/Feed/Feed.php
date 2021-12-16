@@ -228,14 +228,14 @@ class Feed extends Action
                 }
             }
 
+            
+            $csvFilename = 'retargeting.csv';
+
             $content = [];
             $content['type'] = 'filename'; // must keep filename
-            $content['value'] = $filepath;
+            $content['value'] = $csvFilename;
             $content['rm'] = '1'; //remove csv from var folder
 
-            $csvFilename = 'retargeting.csv';
-            
-            //rename($csvFilename, $filepath);
             $this->directory->renameFile($filepath, $csvFilename);
             
             return $this->fileFactory->create($csvFilename, $content, DirectoryList::PUB);
