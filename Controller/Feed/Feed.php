@@ -217,8 +217,8 @@ class Feed extends Action
                                 'sale price' => $this->priceHelper->getProductPrice($product),
                                 'brand' => '',
                                 'category' => $this->retargetingData->getProductCategory($product->getCategoryIds()),
-                                'extra data' => str_replace(['\"','"'], ["'","'"],
-                                json_encode($this->getExtraDataProduct($bundledItemIds, $store, $product->getId()), JSON_UNESCAPED_UNICODE)
+                                'extra data' => str_replace(['\"'], ["'"],
+                                    json_encode($this->getExtraDataProduct($bundledItemIds, $store, $product->getId()), JSON_UNESCAPED_UNICODE)
                                 )
                             ]);
                         }

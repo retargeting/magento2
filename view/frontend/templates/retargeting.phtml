@@ -27,8 +27,8 @@ $shopCartUrl = $block->getConfig(\Retargeting\Tracker\Helper\Data::RETARGETING_S
     (function () {
         ra_key = '<?php echo $block->getPageTrackingCode($trackingAPIKey); ?>';
         ra_params = {
-            add_to_cart_button_id: '<?php echo $addToCartButtonId; ?>',
-            price_label_id: '<?php echo $priceLabelId; ?>'
+            add_to_cart_button_id: '<?php echo empty($addToCartButtonId) ? '#product-addtocart-button' : $addToCartButtonId ?>',
+            price_label_id: '<?php echo empty($priceLabelId) ? '.price-wrapper' : $priceLabelId; ?>'
         };
         var ra = document.createElement('script');
         ra.type = 'text/javascript';
