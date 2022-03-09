@@ -189,7 +189,7 @@ class Data extends AbstractHelper
     public function getProductCategory(array $categories = [])
     {
         if (!count($categories)) {
-            return '';
+            return 'Root';
         }
         foreach ($categories as $categoryId) {
             try {
@@ -326,7 +326,7 @@ class Data extends AbstractHelper
     public function getProductCategoryNamesById(array $categories = [])
     {
         if (!count($categories)) {
-            return [];
+            return ["root"=>"Root"];
         }
         $categoryNames = [];
         foreach ($categories as $categoryId) {
