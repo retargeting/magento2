@@ -286,7 +286,7 @@ class GenerateFeed {
             $extraData['variations'][] = [
                 'code' => $productCollection->getId(),
                 'price' => $this->priceHelper->getFullPrice($productCollection),
-                'sale price' => $this->priceHelper->getProductPrice($productCollection),
+                'sale_price' => $this->priceHelper->getProductPrice($productCollection),
                 'stock' => $this->stockHelper->getQuantity($productCollection, $store),
                 'margin' => null,
                 'in_supplier_stock' => null
