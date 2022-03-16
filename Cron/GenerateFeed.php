@@ -179,6 +179,12 @@ class GenerateFeed {
                             $stock = $this->stockHelper->getQuantity($product, $store);
                             
                             $stock = $stock < 0 ? $defStock : $stock;
+                            
+                            $price = $this->priceHelper->getFullPrice($product);
+
+                            if (empty($price) && $stock === 0) {
+                                continue;
+                            }
 
                             /** @noinspection PhpParamsInspection */
                             $stream->writeCsv([
@@ -187,7 +193,7 @@ class GenerateFeed {
                                 'product url' => $product->getProductUrl(false),
                                 'image url' => $product->getMediaConfig()->getMediaUrl($product->getImage()),
                                 'stock' => $stock,
-                                'price' => $this->priceHelper->getFullPrice($product),
+                                'price' => $price,
                                 'sale price' => $this->priceHelper->getProductPrice($product),
                                 'brand' => '',
                                 'category' => $this->retargetingData->getProductCategory($product->getCategoryIds()),
@@ -279,15 +285,21 @@ class GenerateFeed {
 
         foreach ($stockItems as $productId => $product) {
 
+            $stock = $this->stockHelper->getQuantity($productCollection, $store);
+            $price = $this->priceHelper->getFullPrice($productCollection);
+
+            if (empty($price) && $stock === 0) {
+                continue;
+            }
 
             $productCollection = $this->productRepository->getById($product->getId());
 
             $extraData['media_gallery'][] = $this->retargetingData->getMediaGallery($productCollection);
             $extraData['variations'][] = [
                 'code' => $productCollection->getId(),
-                'price' => $this->priceHelper->getFullPrice($productCollection),
+                'price' => $price,
                 'sale_price' => $this->priceHelper->getProductPrice($productCollection),
-                'stock' => $this->stockHelper->getQuantity($productCollection, $store),
+                'stock' => $stock,
                 'margin' => null,
                 'in_supplier_stock' => null
             ];
