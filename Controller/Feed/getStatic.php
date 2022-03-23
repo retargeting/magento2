@@ -10,7 +10,7 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Retargeting\Tracker\Controller\getStatic;
+namespace Retargeting\Tracker\Controller\Feed;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
@@ -20,7 +20,7 @@ use Retargeting\Tracker\Helper\FeedHelper;
  * Class Feed
  * @package Retargeting\Tracker\Controller\Feed
  */
-class Feed extends Action
+class getStatic extends Action
 {
     public function __construct(Context $context, FeedHelper $_retargetingFeed) {
         parent::__construct($context);

@@ -52,6 +52,7 @@ class Data extends AbstractHelper
     const RETARGETING_IMAGE_SELECTOR = 'retargeting/advanced_settings/imageSelector';
     const RETARGETING_CRON_FEED = 'retargeting/advanced_settings/cronfeed';
     const RETARGETING_DEFAULT_STOCK = 'retargeting/advanced_settings/defaultStock';
+    const RETARGETING_STORE_SELECT = 'retargeting/advanced_settings/storeselect';
 
     /**
      * ModuleList Interface
@@ -135,12 +136,30 @@ class Data extends AbstractHelper
             );
     }
 
-    public function getConfig($configPath, $scope = 'default') {
+    public function getConfig($configPath, $scope = 'default', $def = null) {
+        $scope = $scope ?? 'default';
         return $this->scopeConfig->getValue(
             $configPath,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $scope
-        ) ?? 0;
+        ) ?? $def ?? 0;
+    }
+    
+    public function getScope() {
+        return $this->scopeConfig;
+    }
+
+    public function getCfg($configPath, $def = null) {
+        return $this->scopeConfig->getValue(
+            $configPath,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            'default'
+        ) ?? $def ?? 0;
+    }
+
+    public function checkQty($qty) {
+        return $qty < 0 ?
+            $this->getCfg(\Retargeting\Tracker\Helper\Data::RETARGETING_DEFAULT_STOCK, 0) : $qty;
     }
     /**
      * Return Retargeting Tracker Version
@@ -328,13 +347,9 @@ class Data extends AbstractHelper
         if (!count($categories)) {
             return ["root"=>"Root"];
         }
+        
         $categoryNames = [];
         foreach ($categories as $categoryId) {
-
-            if ($categoryId == 2) { // skip default category
-                continue;
-            }
-
             try {
                 $category = $this->_categoryRepository->get($categoryId);
                 $categoryNames[$categoryId] = $category->getName();
@@ -388,6 +403,4 @@ class Data extends AbstractHelper
 
         return array_unique($formattedGallery);
     }
-
-
 }

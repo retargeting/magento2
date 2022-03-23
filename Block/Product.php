@@ -179,11 +179,6 @@ class Product extends View
         ] : false);
     }
 
-    public function checkQty($qty) {
-        return $qty < 0 ?
-            $this->_retargetingData->getConfig(\Retargeting\Tracker\Helper\Data::RETARGETING_DEFAULT_STOCK) : $qty;
-    }
-
     /**
      * Prepare inventory object
      * @param \Magento\Catalog\Model\Product $product
@@ -194,7 +189,7 @@ class Product extends View
 
         return [
             'variations' => false,
-            'stock' => $this->checkQty($this->_retargetingStockHelper->getQuantity($product, $store))
+            'stock' => $this->_retargetingData->checkQty($this->_retargetingStockHelper->getQuantity($product, $store))
         ];
     }
 

@@ -41,18 +41,18 @@ class Tracker extends Template
      * @param Context $context
      * @param Session $catalogSession
      * @param CollectionFactory $orderCollection
-     * @param Data $retargetingData
+     * @param Data $_retargetingData
      * @param array $data
      */
     public function __construct(
         Context $context,
         Session $catalogSession,
         CollectionFactory $orderCollection,
-        Data $retargetingData,
+        Data $_retargetingData,
         array $data = []
     )
     {
-        $this->_retargetingData = $retargetingData;
+        $this->_retargetingData = $_retargetingData;
         $this->_orderCollection = $orderCollection;
         $this->_catalogSession = $catalogSession;
         parent::__construct($context, $data);
@@ -64,7 +64,7 @@ class Tracker extends Template
      */
     public function getConfig($path)
     {
-        return $this->_scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE);
+        return $this->_retargetingData->getScope()->getValue($path, ScopeInterface::SCOPE_STORE);
     }
 
     /**

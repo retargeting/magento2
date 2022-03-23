@@ -47,15 +47,15 @@ class SetRetargetingTrackerOnOrderSuccessPageViewObserver implements ObserverInt
      * SetRetargetingTrackerOnOrderSuccessPageViewObserver constructor.
      * @param StoreManagerInterface $storeManager
      * @param LayoutInterface $layout
-     * @param Data $retargetingData
+     * @param Data $_retargetingData
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         LayoutInterface $layout,
-        Data $retargetingData
+        Data $_retargetingData
     )
     {
-        $this->_retargetingData = $retargetingData;
+        $this->_retargetingData = $_retargetingData;
         $this->_layout = $layout;
         $this->_storeManager = $storeManager;
     }

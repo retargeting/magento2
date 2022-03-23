@@ -103,7 +103,7 @@ class StockHelper extends AbstractHelper
             break;
         }
 
-        return (int)$qty;
+        return (int) $qty;
     }
 
     /**
