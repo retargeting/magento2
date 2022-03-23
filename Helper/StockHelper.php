@@ -50,6 +50,7 @@ class StockHelper extends AbstractHelper
      */
     public function getQuantity(Product $product, Store $store)
     {
+
         $qty = 0;
         try {
             $website = $store->getWebsite();
@@ -100,7 +101,7 @@ class StockHelper extends AbstractHelper
             break;
         }
 
-        return (int)$qty;
+        return (int) $qty;
     }
 
     /**

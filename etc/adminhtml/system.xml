@@ -58,8 +58,7 @@
                 <field id="addToCart" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
                        showInStore="1">
                     <label>Add To Cart Button Selector</label>
-                    <comment>
-                        <![CDATA[ If you have cutom theme or plugins that use different classes, enter here your add to cart button class or ID. ]]></comment>
+                    <comment><![CDATA[<strong>If you have cutom theme or plugins that use different classes, enter here your add to cart button class or ID.</strong>]]></comment>
                 </field>
                 <field id="priceLabelSelector" translate="label" type="text" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="1">
@@ -80,6 +79,13 @@
                        showInStore="1">
                     <label>CronFeed</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[<strong>If active, please select Stores downbelow</strong>]]></comment>
+                </field>
+                <field id="storeselect" translate="label" type="multiselect" sortOrder="71" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Select Stores</label>
+                    <source_model>Retargeting\Tracker\Model\allstores</source_model>
+                    <comment><![CDATA[<strong>Select Stores to generate static feed by Magento Cron</strong>]]></comment>
                 </field>
                 <field id="defaultStock" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1"
                        showInStore="1">
