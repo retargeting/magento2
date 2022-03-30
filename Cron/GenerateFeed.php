@@ -9,9 +9,12 @@ use Retargeting\Tracker\Helper\FeedHelper;
 
 class GenerateFeed {
 
-    private static $isExec = false;
+    protected $_retargetingFeed;
+    protected $resultJsonFactory;
+    protected $logger;
 
-    public function __construct(Context $context, FeedHelper $_retargetingFeed, JsonFactory $resultJsonFactory) {
+    public function __construct(Context $context, FeedHelper $_retargetingFeed, JsonFactory $resultJsonFactory, \Psr\Log\LoggerInterface $logger) {
+        $this->logger = $logger;
         $this->_retargetingFeed = $_retargetingFeed;
         $this->resultJsonFactory = $resultJsonFactory;
     }
@@ -19,14 +22,15 @@ class GenerateFeed {
 
     public function execute()
     {
-        $resultJson = $this->resultJsonFactory->create();
+        $this->logger->info('Cron Retargeting Works');
 
-        if (!self::$isExec && $this->_retargetingFeed->cronActive !== 0) {
-            self::$isExec = true;
-            
-            return $resultJson->setData($this->_retargetingFeed->cronFeed());
+        try {
+            if ($this->_retargetingFeed->cronActive !== 0) {
+
+                $this->_retargetingFeed->cronFeed();
+            }
+        } catch (\Exception $e) {
+            $this->logger->critical('Error message', ['exception' => $e]);
         }
-
-        return $resultJson->setData(['status' => true]);
     }
 }
