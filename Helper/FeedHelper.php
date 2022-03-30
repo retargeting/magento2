@@ -181,7 +181,7 @@ class FeedHelper extends AbstractHelper
                         $stream->writeCsv([
                             'product id' => $product->getId(),
                             'product name' => $product->getName(),
-                            'product url' => $product->getProductUrl(false),
+                            'product url' => $this->productURL($product, $notCron),
                             'image url' => $product->getMediaConfig()->getMediaUrl($product->getImage()),
                             'stock' => $stock,
                             'price' => $price,
@@ -207,11 +207,25 @@ class FeedHelper extends AbstractHelper
             $status['message'] = $e->getMessage();
             return $status;
         }
-
-        return $this->fileFactory->create($file['rname'].'.csv', $content, DirectoryList::PUB);
+        if ( $notCron ) {
+            return $this->fileFactory->create($file['rname'].'.csv', $content, DirectoryList::PUB);
+        }
+        return $status;
     }
 
-/**
+    private function productURL($product, $notCron = true) {
+
+        $url = $product->getProductUrl(false);
+
+        if (!$notCron) {
+            $url = preg_replace('/(&|\?)'.preg_quote('___store').'=[^&]*$/', '', $url);
+            $url = preg_replace('/(&|\?)'.preg_quote('___store').'=[^&]*&/', '$1', $url);
+        }
+
+        return $url;
+    }
+
+    /**
      * @param array $productIds
      * @param Store $store
      * @param Integer $productId
