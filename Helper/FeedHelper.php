@@ -254,14 +254,14 @@ class FeedHelper extends AbstractHelper
 
         foreach ($stockItems as $productId => $product) {
 
+            $productCollection = $this->productRepository->getById($product->getId());
+
             $stock = $this->stockHelper->getQuantity($productCollection, $store);
             $price = $this->priceHelper->getFullPrice($productCollection);
 
             if (empty($price) && $stock === 0) {
                 continue;
             }
-
-            $productCollection = $this->productRepository->getById($product->getId());
 
             $extraData['media_gallery'][] = $this->_retargetingData->getMediaGallery($productCollection);
             $extraData['variations'][] = [
