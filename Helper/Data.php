@@ -218,7 +218,7 @@ class Data extends AbstractHelper
 
             }
         }
-        return '';
+        return 'Root';
     }
 
     /**
