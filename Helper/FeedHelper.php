@@ -215,7 +215,7 @@ class FeedHelper extends AbstractHelper
 
     private function productURL($product, $notCron = true) {
 
-        $url = $product->getProductUrl(false);
+        $url = $this->fixUrl($product->getProductUrl(false));
 
         if (!$notCron) {
             $url = preg_replace('/(&|\?)'.preg_quote('___store').'=[^&]*$/', '', $url);
@@ -224,6 +224,31 @@ class FeedHelper extends AbstractHelper
 
         return $url;
     }
+
+    function fixUrl($url) {
+
+        $url = str_replace("&amp;", "&", $url);
+    
+        $new_URL = explode("?", $url, 2);
+        $newURL = explode("/",$new_URL[0]);
+    
+        $checkHttp = !empty(array_intersect(["https:","http:"], $newURL));
+    
+        foreach ($newURL as $k=>$v ){
+            if (!$checkHttp || $checkHttp && $k > 2) {
+                $newURL[$k] = rawurlencode($v);
+            }
+        }
+    
+        if (isset($new_URL[1])) {
+            $new_URL[0] = implode("/",$newURL);
+            $new_URL[1] = str_replace("&amp;","&",$new_URL[1]);
+            return implode("?", $new_URL);
+        } else {
+            return implode("/",$newURL);
+        }
+    
+        return $url;
 
     /**
      * @param array $productIds
