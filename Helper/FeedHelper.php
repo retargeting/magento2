@@ -249,6 +249,7 @@ class FeedHelper extends AbstractHelper
         }
     
         return $url;
+    }
 
     /**
      * @param array $productIds
