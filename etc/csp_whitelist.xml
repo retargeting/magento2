@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+ <csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="retargeting-trk" type="host">tracking.retargeting.biz</value>
+                <value id="retargeting-trk2" type="host">tracking.retargeting.app</value>
+                <value id="retargeting" type="host">*.retargeting.biz</value>
+                <value id="retargeting2" type="host">*.retargeting.app</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="retargeting-trk" type="host">tracking.retargeting.biz</value>
+                <value id="retargeting-trk2" type="host">tracking.retargeting.app</value>
+                <value id="retargeting" type="host">*.retargeting.biz</value>
+                <value id="retargeting2" type="host">*.retargeting.app</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="retargeting-trk" type="host">tracking.retargeting.biz</value>
+                <value id="retargeting-trk2" type="host">tracking.retargeting.app</value>
+                <value id="retargeting" type="host">*.retargeting.biz</value>
+                <value id="retargeting2" type="host">*.retargeting.app</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
