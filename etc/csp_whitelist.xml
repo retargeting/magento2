@@ -7,6 +7,8 @@
                 <value id="retargeting-trk2" type="host">tracking.retargeting.app</value>
                 <value id="retargeting" type="host">*.retargeting.biz</value>
                 <value id="retargeting2" type="host">*.retargeting.app</value>
+                <value id="retargeting-googleads" type="host">googleads.g.doubleclick.net</value>
+                <value id="retargeting-googleads1" type="host">*.doubleclick.net</value>
             </values>
         </policy>
         <policy id="style-src">
@@ -23,6 +25,16 @@
                 <value id="retargeting-trk2" type="host">tracking.retargeting.app</value>
                 <value id="retargeting" type="host">*.retargeting.biz</value>
                 <value id="retargeting2" type="host">*.retargeting.app</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="retargeting-facebook" type="host">*.facebook.com</value>
+                <value id="retargeting-facebook1" type="host">facebook.com</value>
+                <value id="retargeting-google1" type="host">google.com</value>
+                <value id="retargeting-google2" type="host">*.google.com</value>
+                <value id="retargeting-google3" type="host">*.google.ro</value>
+                <value id="retargeting-google4" type="host">google.ro</value>
             </values>
         </policy>
     </policies>
