@@ -6,7 +6,6 @@ namespace Retargeting\Tracker\Helper;
 use Magento\Bundle\Model\Product\Type as Bundled;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type as ProductType;
-use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -14,6 +13,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\Website;
+use Magento\Inventory\Model\SourceItem\Command\GetSourceItemsBySku;
 
 /**
  * Class StockHelper
@@ -34,11 +34,13 @@ class StockHelper extends AbstractHelper
     public function __construct(
         Context $context,
         StockRegistry $stockProvider,
+        GetSourceItemsBySku $getSourceItemsBySku,
         PriceHelper $_retargetingPriceHelper
     )
     {
         parent::__construct($context);
         $this->stockProvider = $stockProvider;
+        $this->getSourceItemsBySku = $getSourceItemsBySku;
         $this->_retargetingPriceHelper = $_retargetingPriceHelper;
 
     }
