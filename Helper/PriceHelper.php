@@ -331,7 +331,10 @@ class PriceHelper extends AbstractHelper
      */
     public function formatPrice($price)
     {
-        return number_format($price, 2, '.', '');
+        if((float)$price > 0) {
+            return number_format($price, 2, '.', '');
+        }
+        return 0;
     }
 
     /**
