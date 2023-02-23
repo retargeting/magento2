@@ -41,7 +41,6 @@ use Magento\Store\Model\Website;
  */
 class FeedHelper extends AbstractHelper
 {
-    
     public function __construct(
         Context $context,
         FileFactory $fileFactory,
@@ -75,6 +74,7 @@ class FeedHelper extends AbstractHelper
     }
 
     private static $ids = [];
+    private static $debugProductId = null;
     private $defStock = 0;
     public $cronActive = 0;
 
@@ -92,37 +92,47 @@ class FeedHelper extends AbstractHelper
     }
 
     public function staticFeed() {
-        
         return $this->generateFeed(null, 1, 100, true, true);
     }
 
     public function genFeed() {
-        
+        return $this->generateFeed();
+    }
+
+    public function debugFeedForProductId($id, $json = false) {
+        self::$debugProductId = $id;
+
+        if ($json) {
+            foreach ($this->getProductById($id) as $product) {
+                return $product;
+            }
+        }
+
         return $this->generateFeed();
     }
 
     public function generateFeed($file = null, $currentPage = 1, $size = 100, $notCron = true, $static = false, $storeID = null) {
-        
+        $debug = self::$debugProductId !== null;
         if ($storeID === null) {
             $storeID = $this->_storeManager->getStore()->getId();
         }
         if ($file === null) {
             $file = [
                 'name' => 'retargeting.'. $storeID,
+                'debugName' => 'retargeting-debug.'. $storeID,
                 'rname' => 'retargeting',
                 'tmpName' => 'retargeting.'.time()
             ];
         }
 
-        $status = ['status'=>'success','message'=>null, 'file' => $file['name'].'.csv', 'generated' => false];
+        $status = ['status' => 'success', 'message' => null, 'file' => $file['name'].'.csv', 'generated' => false];
 
         $content = [];
         $content['type'] = 'filename'; // must keep filename
-        $content['value'] = $file['name'].'.csv';
+        $content['value'] = ($debug ? $file['debugName'] : $file['name']) . '.csv';
         $content['rm'] = '0'; //remove csv from var folder
 
         if ($static && $this->directory->isFile($file['name'].'.csv')) {
-
             return $this->fileFactory->create($file['rname'].'.csv', $content, DirectoryList::PUB);
         }
 
@@ -151,9 +161,8 @@ class FeedHelper extends AbstractHelper
 
         $store = $this->_storeManager->getStore($storeID);
 
-
         while (!$productLoopExit) {
-            $products = $this->getProducts($currentPage, $size, $storeID);
+            $products = $debug ? $this->getProductById(self::$debugProductId) : $this->getProducts($currentPage, $size, $storeID);
             $currentPage++;
             if (!count($products)
                 || (array_values(array_slice($products, -1))[0]->getId() == $lastProductId)
@@ -200,16 +209,18 @@ class FeedHelper extends AbstractHelper
         }
 
         try {
-            $this->directory->renameFile($file['tmpName'].'.csv', $file['name'] .'.csv');
-        } catch (\Exception $e) {
-
+            $this->directory->renameFile($file['tmpName'] . '.csv', ($debug ? $file['debugName'] : $file['name']) .'.csv');
+        }
+        catch (\Exception $e) {
             $status['status'] = 'readProblem';
             $status['message'] = $e->getMessage();
             return $status;
         }
-        if ( $notCron ) {
-            return $this->fileFactory->create($file['rname'].'.csv', $content, DirectoryList::PUB);
+
+        if ($notCron) {
+            return $this->fileFactory->create($file['rname'] . '.csv', $content, DirectoryList::PUB);
         }
+
         return $status;
     }
 
@@ -247,7 +258,7 @@ class FeedHelper extends AbstractHelper
         } else {
             return implode("/",$newURL);
         }
-    
+
         return $url;
     }
 
@@ -343,6 +354,36 @@ class FeedHelper extends AbstractHelper
 
         $this->searchCriteriaBuilder->setCurrentPage($page);
         $this->searchCriteriaBuilder->setPageSize($pageSize);
+
+        $searchCriteria = $this->searchCriteriaBuilder->create();
+
+        return $this->productRepository->getList($searchCriteria)->getItems();
+    }
+
+    public function getProductById($id)
+    {
+        $this->searchCriteriaBuilder->addFilter(
+            'entity_id',
+            [
+                $id
+            ],
+            'eq'
+        );
+
+        $this->searchCriteriaBuilder->addFilter(
+            'status',
+            Status::STATUS_ENABLED
+        );
+
+        $this->searchCriteriaBuilder->addFilter('store_id', 1, 'eq');
+
+        $this->searchCriteriaBuilder->addFilter(
+            'visibility',
+            Visibility::VISIBILITY_BOTH
+        );
+
+        $this->searchCriteriaBuilder->setCurrentPage(1);
+        $this->searchCriteriaBuilder->setPageSize(100);
 
         $searchCriteria = $this->searchCriteriaBuilder->create();
 
