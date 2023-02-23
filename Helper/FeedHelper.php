@@ -104,7 +104,17 @@ class FeedHelper extends AbstractHelper
 
         if ($json) {
             foreach ($this->getProductById($id) as $product) {
-                return $product;
+                $pricing_extra_info = [
+                    'tierPrices' => $product->getTierPrices(),
+                    'priceInfo' => $product->getPriceInfo(),
+                    'priceModel' => $product->getPriceModel(),
+                    'getPriceInfo' => $product->getPriceInfo(),
+                    'getFinalPrice' => $product->getFinalPrice(),
+                    'getSpecialPrice' => $product->getSpecialPrice(),
+                    'getMinimalPrice' => $product->getMinimalPrice(),
+                    'getCalculatedFinalPrice' => $product->getCalculatedFinalPrice(),
+                ];
+                return array_merge((array)$product, $pricing_extra_info);
             }
         }
 
