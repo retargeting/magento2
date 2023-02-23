@@ -43,7 +43,7 @@ class debugProduct extends Action
                 $result->setHeader('Content-Type', 'application/json');
 
                 $product = $this->_retargetingFeed->debugFeedForProductId($this->request->getParam('id'), $json);
-                return $result->setJsonData($product);
+                return $result->setData($product);
             }
             $this->_retargetingFeed->debugFeedForProductId($this->request->getParam('id'));
         }
