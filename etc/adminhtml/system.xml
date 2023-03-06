@@ -92,6 +92,43 @@
                     <label>Default Stock in case of negative value</label>
                     <source_model>Retargeting\Tracker\Model\defaultStock</source_model>
                 </field>
+                <field id="rec_status" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Recommendation Engine</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="rec_data" translate="label" type="text" sortOrder="91" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Recommendation Engine</label>
+                <field id="home_page" translate="label" type="Retargeting\Tracker\Model\Recengine" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[<strong>Home Page</strong>]]></label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="category_page" translate="label" type="Retargeting\Tracker\Model\Recengine" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[<strong>Category Page</strong>]]></label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="product_page" translate="label" type="Retargeting\Tracker\Model\Recengine" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[<strong>Product Page</strong>]]></label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="shopping_cart" translate="label" type="Retargeting\Tracker\Model\Recengine" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[<strong>Shopping Cart</strong>]]></label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="thank_you_page" translate="label" type="Retargeting\Tracker\Model\Recengine" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[<strong>Thank you Page</strong>]]></label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="search_page" translate="label" type="Retargeting\Tracker\Model\Recengine" sortOrder="106" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[<strong>Search Page</strong>]]></label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="page_404" translate="label" type="Retargeting\Tracker\Model\Recengine" sortOrder="107" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[<strong>Page 404</strong>]]></label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
             </group>
         </section>
     </system>
