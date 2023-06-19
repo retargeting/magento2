@@ -8,6 +8,9 @@ use Magento\CatalogInventory\Model\StockRegistryProvider as MagentoStockRegistry
 
 class StockRegistry extends MagentoStockRegistryProvider
 {
+    protected $stockStatusCriteriaFactory;
+
+    protected $stockStatusRepository;
     const DEFAULT_STOCK_SCOPE = 0;
 
     public function getStockStatuses(array $productIds, $scopeId = self::DEFAULT_STOCK_SCOPE)

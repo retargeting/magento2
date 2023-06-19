@@ -7,7 +7,7 @@ use Magento\Framework\App\Action\Context;
 use Retargeting\Tracker\Helper\FeedHelper;
 
 class Cron extends Action {
-
+    protected $_retargetingFeed;
     public function __construct(Context $context, FeedHelper $_retargetingFeed) {
         parent::__construct($context);
         $this->_retargetingFeed = $_retargetingFeed;

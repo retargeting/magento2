@@ -41,6 +41,22 @@ use Magento\Store\Model\Website;
  */
 class FeedHelper extends AbstractHelper
 {
+    private $fileFactory;
+
+    private $directory;
+
+    private $_storeManager;
+
+    private $_retargetingData;
+
+    private $productRepository;
+
+    private $stockHelper;
+
+    private $priceHelper;
+
+    private $Store;
+
     public function __construct(
         Context $context,
         FileFactory $fileFactory,
@@ -57,12 +73,12 @@ class FeedHelper extends AbstractHelper
 
         $this->directory = $filesystem->getDirectoryWrite(DirectoryList::PUB);
 
-        $this->_storeManager = $storeManager; 
+        $this->_storeManager = $storeManager;
 
         $this->_retargetingData = $_retargetingData;
 
         $this->productRepository = $productRepository;
-        
+
         $this->stockHelper = $retargetingStockHelper;
 
         $this->priceHelper = $priceHelper;
@@ -188,7 +204,7 @@ class FeedHelper extends AbstractHelper
                         $bundledItemIds = $productType->getChildrenIds($product->getId(), $required = true);
 
                         $stock = $this->stockHelper->getQuantity($product, $store);
-                        
+
                         $stock = $stock < 0 ? $this->defStock : $stock;
                         $price = $this->priceHelper->getFullPrice($product);
 
@@ -249,18 +265,18 @@ class FeedHelper extends AbstractHelper
     function fixUrl($url) {
 
         $url = str_replace("&amp;", "&", $url);
-    
+
         $new_URL = explode("?", $url, 2);
         $newURL = explode("/",$new_URL[0]);
-    
+
         $checkHttp = !empty(array_intersect(["https:","http:"], $newURL));
-    
+
         foreach ($newURL as $k=>$v ){
             if (!$checkHttp || $checkHttp && $k > 2) {
                 $newURL[$k] = rawurlencode($v);
             }
         }
-    
+
         if (isset($new_URL[1])) {
             $new_URL[0] = implode("/",$newURL);
             $new_URL[1] = str_replace("&amp;","&",$new_URL[1]);
