@@ -81,6 +81,8 @@ class Data extends AbstractHelper
     private $storeManager;
     private $taxCalculation;
 
+    protected $scopeConfig;
+
 
     /**
      * Data constructor.
@@ -144,7 +146,7 @@ class Data extends AbstractHelper
             $scope
         ) ?? $def ?? 0;
     }
-    
+
     public function getScope() {
         return $this->scopeConfig;
     }
@@ -347,7 +349,7 @@ class Data extends AbstractHelper
         if (!count($categories)) {
             return ["root"=>"Root"];
         }
-        
+
         $categoryNames = [];
         foreach ($categories as $categoryId) {
             try {
@@ -357,7 +359,7 @@ class Data extends AbstractHelper
 
             }
         }
-        
+
         return $categoryNames;
     }
 

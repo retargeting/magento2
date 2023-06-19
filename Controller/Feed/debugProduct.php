@@ -25,6 +25,13 @@ use Retargeting\Tracker\Helper\FeedHelper;
  */
 class debugProduct extends Action
 {
+    protected $_retargetingFeed;
+
+    protected $_retargetingData;
+
+    protected $request;
+
+    protected $resultFactory;
     public function __construct(Context $context, FeedHelper $_retargetingFeed, Http $request, Data $_retargetingData) {
         parent::__construct($context);
         $this->_retargetingFeed = $_retargetingFeed;
