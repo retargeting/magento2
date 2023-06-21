@@ -22,6 +22,8 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 
 use Magento\Store\Model\Store;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+
 use Retargeting\Tracker\Helper\PriceHelper;
 use Retargeting\Tracker\Helper\StockHelper;
 use Retargeting\Tracker\Helper\Data;
@@ -57,6 +59,8 @@ class FeedHelper extends AbstractHelper
 
     private $Store;
 
+    protected $_scopeConfig;
+
     public function __construct(
         Context $context,
         FileFactory $fileFactory,
@@ -66,7 +70,8 @@ class FeedHelper extends AbstractHelper
         StockHelper $retargetingStockHelper,
         PriceHelper $priceHelper,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        ScopeConfigInterface $scopeConfig
     ) {
         parent::__construct($context);
         $this->fileFactory = $fileFactory;
@@ -87,6 +92,8 @@ class FeedHelper extends AbstractHelper
 
         $this->cronActive = $_retargetingData->getCfg(\Retargeting\Tracker\Helper\Data::RETARGETING_CRON_FEED, 0);
         $this->defStock = $_retargetingData->getCfg(\Retargeting\Tracker\Helper\Data::RETARGETING_DEFAULT_STOCK, 0);
+
+        $this->_scopeConfig = $scopeConfig;
     }
 
     private static $ids = [];
@@ -310,6 +317,7 @@ class FeedHelper extends AbstractHelper
         $parentProd = $this->productRepository->getById($productId);
 
         $extraData = [];
+        $extraData['product_weight'] = $this->getProductWeight($parentProd);
         $extraData['margin'] = null;
         $extraData['categories'] = $this->_retargetingData->getProductCategoryNamesById($parentProd->getCategoryIds());
         $extraData['media_gallery'][] = $parentProd->getMediaConfig()->getMediaUrl($parentProd->getImage());
@@ -353,6 +361,30 @@ class FeedHelper extends AbstractHelper
      * @var SearchCriteriaBuilder
      */
     protected $searchCriteriaBuilder;
+
+    public function getWeightUnit()
+    {
+        return $this->_scopeConfig->getValue(
+            'general/locale/weight_unit',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    private function formatWeightToKg($unit,$weight) {
+        if(strtoupper($unit) === "G") {
+            return $weight/1000;
+        }else if(strtoupper($unit) === 'LBS') {
+            return $weight*0.45359237;
+        }else if(strtoupper($unit) === 'OZ') {
+            return $weight/35.27396195;
+        }
+        return $weight;
+    }
+
+    private function getProductWeight($product) {
+        return number_format($this->formatWeightToKg($this->getWeightUnit(),$product->getWeight()), 2, '.', '') > 0
+            ? number_format($this->formatWeightToKg($this->getWeightUnit(),$product->getWeight()), 2, '.', '') : 0.01;
+    }
 
     public function getProducts($page = 1, $pageSize = 100, $StoreID = 1)
     {
