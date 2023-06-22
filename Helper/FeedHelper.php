@@ -383,7 +383,7 @@ class FeedHelper extends AbstractHelper
 
     private function getProductWeight($product) {
         return number_format($this->formatWeightToKg($this->getWeightUnit(),$product->getWeight()), 2, '.', '') > 0
-            ? number_format($this->formatWeightToKg($this->getWeightUnit(),$product->getWeight()), 2, '.', '') : 0.01;
+            ? (float)number_format($this->formatWeightToKg($this->getWeightUnit(),$product->getWeight()), 2, '.', '') : 0.01;
     }
 
     public function getProducts($page = 1, $pageSize = 100, $StoreID = 1)
