@@ -91,6 +91,10 @@ class Generator extends Action
 
     protected $scope;
 
+    protected $_objectManager;
+
+    protected $resultFactory;
+
 
     /**
      * Generator constructor.

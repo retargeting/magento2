@@ -7,6 +7,7 @@ namespace Retargeting\Tracker\Model;
 
 class allstores implements \Magento\Framework\Option\ArrayInterface
 {
+    private $_storeManager;
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager
     )

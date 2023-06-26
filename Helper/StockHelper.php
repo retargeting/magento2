@@ -25,6 +25,8 @@ class StockHelper extends AbstractHelper
     private $stockProvider;
     private $getSourceItemsBySku = null;
 
+    private $_retargetingPriceHelper;
+
     /**
      * StockHelper constructor.
      * @param Context $context
@@ -200,7 +202,7 @@ class StockHelper extends AbstractHelper
 
         if ($this->getSourceItemsBySku !== null) {
             $sourceItems = $this->getSourceItemsBySku->execute($product->getSku());
-            
+
             foreach ($sourceItems as $sourceItemId => $sourceItem) {
                 $quantities += $sourceItem->getQuantity();
             }

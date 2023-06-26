@@ -55,6 +55,8 @@ class Product extends View
     protected $_retargetingPriceHelper;
     protected $_retargetingStockHelper;
 
+    protected $_productRepository;
+
     /**
      * Product constructor.
      * @param Context $context
