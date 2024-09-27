@@ -25,6 +25,8 @@
                 <value id="retargeting-trk2" type="host">tracking.retargeting.app</value>
                 <value id="retargeting" type="host">*.retargeting.biz</value>
                 <value id="retargeting2" type="host">*.retargeting.app</value>
+                <value id="google" type="host">*.google.com</value>
+                <value id="google2" type="host">google.com</value>
             </values>
         </policy>
         <policy id="img-src">
