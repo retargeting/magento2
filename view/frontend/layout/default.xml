@@ -26,8 +26,8 @@
         <referenceBlock name="before.body.end">
             <block class="Retargeting\Tracker\Block\Recengine"
                    name="retargeting_tracker_recengine"
-                   as="retargeting_tracker_recengine"
-                   cacheable="false" />
+                   as="retargeting_tracker_recengine" />
+                   <!-- cacheable="false" /> -->
         </referenceBlock>
     </body>
 </page>
