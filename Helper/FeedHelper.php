@@ -102,13 +102,31 @@ class FeedHelper extends AbstractHelper
     public $cronActive = 0;
 
     public function cronFeed() {
+        $this->Store = [];
 
-        $this->Store = explode(',',
-            $this->_retargetingData->getCfg(\Retargeting\Tracker\Helper\Data::RETARGETING_STORE_SELECT, "1")
-        );
+        foreach ($this->_storeManager->getStores() as $store) {
+
+            if (!$store->getIsActive()) {
+                continue;
+            }
+
+            $storeId = $store->getId();
+
+            $enabled = $this->_retargetingData->getCfg(
+                \Retargeting\Tracker\Helper\Data::RETARGETING_STATUS,
+                0,
+                $storeId
+            );
+
+            if ($enabled) {
+                $this->Store[] = $storeId;
+            }
+        }
+
+        $last = null;
 
         foreach ($this->Store as $storeID) {
-           $last = $this->generateFeed(null, 1, 100, false, false, $storeID);
+            $last = $this->generateFeed(null, 1, 100, false, false, $storeID);
         }
 
         return $last;

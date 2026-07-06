@@ -151,11 +151,11 @@ class Data extends AbstractHelper
         return $this->scopeConfig;
     }
 
-    public function getCfg($configPath, $def = null) {
+    public function getCfg($configPath, $def = null, $store = 'default') {
         return $this->scopeConfig->getValue(
             $configPath,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            'default'
+            $store
         ) ?? $def ?? 0;
     }
 
