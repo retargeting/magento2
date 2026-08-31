@@ -287,30 +287,41 @@ class FeedHelper extends AbstractHelper
         return $url;
     }
 
-    function fixUrl($url) {
+    private function fixUrl($url)
+    {
+        $url = str_replace('&amp;', '&', $url);
 
-        $url = str_replace("&amp;", "&", $url);
-
-        $new_URL = explode("?", $url, 2);
-        $newURL = explode("/",$new_URL[0]);
-
-        $checkHttp = !empty(array_intersect(["https:","http:"], $newURL));
-
-        foreach ($newURL as $k=>$v ){
-            if (!$checkHttp || $checkHttp && $k > 2) {
-                $newURL[$k] = rawurlencode($v);
-            }
+        $fragment = '';
+        $hashPos = strpos($url, '#');
+        if ($hashPos !== false) {
+            $fragment = substr($url, $hashPos);
+            $url = substr($url, 0, $hashPos);
         }
 
-        if (isset($new_URL[1])) {
-            $new_URL[0] = implode("/",$newURL);
-            $new_URL[1] = str_replace("&amp;","&",$new_URL[1]);
-            return implode("?", $new_URL);
+        $query = '';
+        $queryPos = strpos($url, '?');
+        if ($queryPos !== false) {
+            $query = substr($url, $queryPos);
+            $url = substr($url, 0, $queryPos);
+        }
+
+        if (preg_match('#^(https?://[^/]+|//[^/]+)(/.*)?$#i', $url, $matches)) {
+            $base = $matches[1];
+            $path = $matches[2] ?? '';
         } else {
-            return implode("/",$newURL);
+            $base = '';
+            $path = $url;
         }
 
-        return $url;
+        $segments = explode('/', $path);
+        foreach ($segments as $index => $segment) {
+            if ($segment === '') {
+                continue;
+            }
+            $segments[$index] = rawurlencode(rawurldecode($segment));
+        }
+
+        return $base . implode('/', $segments) . $query . $fragment;
     }
 
     /**
